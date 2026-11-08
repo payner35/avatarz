@@ -63,7 +63,8 @@ export class SplatRenderer implements Renderer {
     this.opts = {
       backgroundColor: opts.backgroundColor ?? '',
       frameBust: opts.frameBust ?? true,
-      bust: opts.bust ?? { centerY: 0.47, height: 0.44 },
+      // 0.44: the capture ends raggedly ~5 cm below the collar; this keeps that edge just outside a square stage.
+      bust: opts.bust ?? { centerY: 0.44, height: 0.44 },
       finish: opts.finish ?? true,
       pixelRatioCap: opts.pixelRatioCap ?? 1.5,
     };
@@ -127,7 +128,8 @@ export class SplatRenderer implements Renderer {
     if (this.opts.frameBust) this.frameBust();
     this.applyPixelRatio();
     this.resizeObs?.disconnect();
-    this.resizeObs = new ResizeObserver(() => setTimeout(() => this.applyPixelRatio(), 50));
+    // The library resets its camera on resize, which drops our view offset: re-frame as well.
+    this.resizeObs = new ResizeObserver(() => setTimeout(() => { this.applyPixelRatio(); if (this.opts.frameBust) this.frameBust(); }, 50));
     this.resizeObs.observe(this.host);
   }
 

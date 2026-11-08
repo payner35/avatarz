@@ -67,15 +67,9 @@ of the delay line, so the mouth motion itself is unchanged; only its timing move
 ## The chest smear (2026-11-08)
 
 The skin-coloured blur under the collar of the LAM heads is the end of the capture: the open neckline's
-last gaussians have no neighbours below them. Three things were tried on Jane with `tools/clean_splat.py`
-(it edits `offset.ply` opacities in the zip; gaussian i sits at skin.glb vertex i plus its offset, and
-`vertex_order.json` is only the draw order):
-
-| method | result |
-|---|---|
-| hide everything below a height, with a fade | smear gone, shoulders gone too: the jacket is the lowest part of the capture |
-| hide the biggest gaussians low down | removed the neck itself; the whole capture is ~1 cm gaussians |
-| **hide a 14 cm wide chest strip below y 1.50, 3 cm fade** | smear gone, shoulders untouched; the neck meets the jacket like a closed neckline |
-
-There are no more shoulders in the bundle than the default framing shows: framed wider, the jacket's own
-ragged bottom edge comes into view. `Jane-clean.zip` is built by `tools/fetch-assets.sh`.
+last gaussians have no neighbours below them. Editing the asset was a dead end, tried three ways on Jane
+(hide below a height: shoulders go too, the jacket is the lowest part; hide the biggest gaussians: the
+neck goes, the whole head is ~1 cm gaussians; hide a chest strip: a dark hole, worse). The fix is framing:
+the stage's bottom edge cuts the jacket where it is dense (`bust.centerY` 0.44), and the framing is
+re-applied on resize, because the library resets its camera then and the zoomed-out default showed the
+whole ragged bottom. There are no more shoulders in the bundle than this framing shows.
