@@ -28,6 +28,15 @@ export interface HeadAudioOptions {
    * (measured: the runner-up is typically 0.9 units behind the winner, so it blends in at ~0.3).
    */
   softness?: number;
+  /**
+   * How far the lips run ahead of the sound, ms. Real lips form a shape 50–100 ms before it is heard
+   * (rounding before "oo", closing before "b"). Added to the audible delay, so the mouth is shown that
+   * much before the ear gets it. Default 60: with tools/lagprobe.js on 2026-11-08 the jaw onsets led
+   * the sound by ~45 ms on the delay line's 100 ms floor and ~115 ms at 145 ms; the draw eats ~25 ms
+   * of any lead, so 60 (a 120 ms delay) shows the lips ~60 ms ahead of the ear. The tap's 100 ms
+   * floor means values under 40 change nothing.
+   */
+  leadMs?: number;
 }
 
 // Where the worklet and model live relative to this module. The library build
@@ -44,8 +53,9 @@ const loadedContexts = new WeakMap<BaseAudioContext, Promise<void>>();
 
 export class HeadAudioExtractor implements Extractor {
   readonly name = 'headaudio';
-  /** Half a 32 ms window + one 16 ms hop + VAD gate ≈ 50–60 ms. */
-  readonly latencyMs = 60;
+  /** Half a 32 ms window + one 16 ms hop + VAD gate ≈ 50–60 ms, plus the lip lead. */
+  get latencyMs(): number { return 60 + this.leadMs; }
+  private readonly leadMs: number;
 
   private node: HeadAudio | null = null;
   private source: AudioNode | null = null;
@@ -76,6 +86,7 @@ export class HeadAudioExtractor implements Extractor {
     this.closeRate = opts.closeRate ?? 18;
     this.silenceMs = opts.silenceMs ?? 250;
     this.softness = opts.softness ?? 0.7;
+    this.leadMs = opts.leadMs ?? 60;
   }
 
   async start(node: AudioNode, context: AudioContext): Promise<void> {

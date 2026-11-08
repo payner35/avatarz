@@ -209,8 +209,8 @@ $('synctest').onclick = async () => {
   await context.resume();
   const res = await fetch(CLIP_URL);
   const pcm = wavData(await res.arrayBuffer());
-  // Pick a loud 350 ms stretch of the clip.
-  const win = Math.round(0.35 * 24000);
+  // Pick a loud 700 ms stretch of the clip (HeadAudio's voice gate never opens on anything shorter).
+  const win = Math.round(0.7 * 24000);
   let best = 0, bestE = 0;
   for (let i = 24000; i < pcm.length - win; i += 2400) { let e = 0; for (let k = 0; k < win; k += 4) e += Math.abs(pcm[i + k]); if (e > bestE) { bestE = e; best = i; } }
   const buf = context.createBuffer(1, win, 24000);

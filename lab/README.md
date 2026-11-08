@@ -46,3 +46,20 @@ Known remaining difference: amplitude, not burstiness. The real head and eyes mo
 
 The author bisected with the Life switch: lips only and lips + eyes did not jump; anything with the head did. A pure 10° yaw sweep did not jump either, so the renderer's sort was cleared. Logging every head pose the renderer requested during speech showed yaw steps of 0.02°/frame but pitch steps of 0.155°/frame (9°/s), every one coinciding with the jaw: the "speech nod" term tied head pitch to jaw opening, so the head bobbed on every syllable. Removed; speech now only lowers the head slowly through the envelope.
 Lesson for the grader: a 0.15° head step per frame was under the number scorer's bone limit (0.4°) and under the pixel grader's burst threshold, yet it was the whole complaint. Per-syllable *periodic* motion of the head is a pattern to flag, not a step size.
+
+## Lips that lead the sound (2026-11-08, HeadAudio path)
+
+Real lips form a shape 50–100 ms before the sound is heard. `tools/lagprobe.js` (paste into the page
+console, `await lagProbe(window.avatarz, 20)`) plays the sample clip, records `jawOpen` against the audio
+clock and cross-correlates the ONSETS of the heard envelope with the jaw's. Level correlation was useless
+(peak ±50 ms wide); onsets give a 5 ms peak. Positive = jaw weights move before the sound; the draw
+eats ~25 ms of that.
+
+| HeadAudio `leadMs` | audible delay | probe lead | sync test |
+|---|---|---|---|
+| 0 (old) | 100 ms (tap floor) | +40 to +50 | never opened (350 ms bursts too short for the voice gate) |
+| 85 | 145 ms | +115 to +120 | – |
+| **60 (default)** | 120 ms | +100 | mouth EARLY by 58 ms (−47…−63 over 5 bursts) |
+
+The sync test's burst is now 700 ms so HeadAudio's voice gate opens on it. The lead is a plain widening
+of the delay line, so the mouth motion itself is unchanged; only its timing moved.
