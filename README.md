@@ -4,7 +4,7 @@ A talking head that runs entirely in the browser and lip-syncs in real time to a
 
 ![avatarz demo: a photoreal head lip-syncing to speech in the browser](docs/demo.gif)
 
-[Watch with sound (mp4, 16 s)](docs/demo.mp4). Recorded straight from the test page: the audio track is the sound as the page plays it, through the same delay line the face is synced to, so what you hear is what the face was shown. It listens to the sound, not to the voice vendor, so it sits in front of any text-to-speech or realtime voice model with no per-vendor integration.
+[Watch with sound (mp4, 20 s, 1080p)](docs/demo.mp4). Recorded straight from the test page: the audio track is the sound as the page plays it, through the same delay line the face is synced to, so what you hear is what the face was shown. It listens to the sound, not to the voice vendor, so it sits in front of any text-to-speech or realtime voice model with no per-vendor integration.
 
 - **Private by construction.** Nothing leaves the page at runtime: no avatar cloud, no hosted inference, no CDN. Every model, runtime and head is served from your own origin.
 - **Vendor-agnostic.** The only contract with the voice source is an `AudioNode`. No word timestamps, no visemes, no transcript are assumed.
