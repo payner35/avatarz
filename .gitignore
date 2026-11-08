@@ -1,0 +1,15 @@
+node_modules
+dist
+.DS_Store
+*.log
+assets/wav2arkit/*.onnx*
+assets/wav2arkit/wav2arkit_pre*
+lab/recordings/
+lab/screencast/
+# fetched by tools/fetch-assets.sh (runtimes from npm, model from Hugging Face, sample heads from their repos)
+assets/ort/
+assets/mediapipe/
+assets/avatars/*.zip
+assets/avatars/*.glb
+assets/avatars/*.vrm
+lab/strips/

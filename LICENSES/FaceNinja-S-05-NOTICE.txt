@@ -1,0 +1,1 @@
+FaceNinja-S-05.glb is NOT included in this repository: FaceNinja's terms for the free sample heads were not confirmed. To try the GLB renderer, download a sample from https://faceninja.net (GLB, ARKit) and drop it into assets/avatars/. Keep the provenance metadata embedded in the file.

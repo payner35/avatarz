@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>avatarz test page</title>
+<style>
+  :root { --bg:#0f1115; --fg:#e8e8ea; --mut:#8b8f98; --acc:#5bd1a4; --card:#171a21; --line:#262a33; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+  main { display:grid; grid-template-columns: minmax(280px, 1fr) 320px; gap:16px; padding:16px; max-width:1100px; margin:0 auto; }
+  @media (max-width: 720px) { main { grid-template-columns: 1fr; } }
+  .stage { border:1px solid var(--line); border-radius:12px; aspect-ratio: 1 / 1; position:relative; overflow:hidden;
+    background: radial-gradient(ellipse 70% 60% at 50% 40%, #2a2f3a 0%, #171a21 60%, #0e1015 100%); }
+  canvas { width:100%; height:100%; display:block; }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:12px; }
+  h1 { font-size:15px; margin:0; letter-spacing:.02em; }
+  h2 { font-size:11px; margin:6px 0 0; color:var(--mut); text-transform:uppercase; letter-spacing:.08em; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  button, select { font:inherit; background:#232833; color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:7px 10px; cursor:pointer; }
+  button.on { border-color:var(--acc); color:var(--acc); }
+  button.danger { border-color:#e26d6d; color:#e26d6d; }
+  label { color:var(--mut); font-size:12px; display:flex; gap:8px; align-items:center; }
+  input[type=range] { flex:1; }
+  table { width:100%; border-collapse:collapse; font-variant-numeric: tabular-nums; }
+  td { padding:3px 0; border-bottom:1px solid var(--line); }
+  td:last-child { text-align:right; color:var(--acc); }
+  .bars { display:grid; grid-template-columns: repeat(15, 1fr); gap:2px; height:48px; align-items:end; }
+  .bars div { background:var(--acc); min-height:1px; border-radius:2px 2px 0 0; opacity:.9; }
+  .bars span { font-size:9px; color:var(--mut); text-align:center; display:block; }
+  .meta { font-size:11px; color:var(--mut); word-break:break-word; }
+  .status { position:absolute; left:10px; top:10px; font-size:11px; color:var(--mut); background:rgba(0,0,0,.4); padding:3px 7px; border-radius:6px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="stage">
+    <canvas id="stage"></canvas>
+    <div class="status" id="status">loading…</div>
+  </div>
+  <aside class="panel">
+    <h1>avatarz · test page</h1>
+    <h2>Source</h2>
+    <div class="row">
+      <button id="src-file">File</button>
+      <button id="src-mic">Microphone</button>
+      <button id="src-pcm">PCM stream</button>
+      <button id="stop" class="danger">Barge-in</button>
+      <button id="webcam">Webcam: look at me</button>
+    </div>
+    <h2>Pipeline</h2>
+    <div class="row">
+      <label>Extractor <select id="extractor"><option value="wav2arkit">Wav2ARKit neural int8 (default, 101 MB once)</option><option value="headaudio">HeadAudio soft visemes (14 kB)</option><option value="formant">Formant (fallback)</option></select></label>
+      <label>Avatar <select id="head"></select></label>
+      <label>Renderer <select id="renderer"><option value="auto">Auto (from avatar file)</option><option value="sprite">Sprite (no avatar)</option></select></label>
+    </div>
+    <div class="row">
+      <label>Emotion <select id="emotion"><option value="auto">auto (from voice)</option><option>neutral</option><option>warm</option><option>amused</option><option>concerned</option><option>surprised</option><option>thoughtful</option></select></label>
+      <label>Life <select id="life"><option value="4">everything</option><option value="2">lips + eyes + head (no emotion)</option><option value="3">lips + eyes + emotion (no head)</option><option value="1">lips + eyes</option><option value="0">lips only</option></select></label>
+      <label>State <select id="state"><option>idle</option><option>active</option><option>listening</option><option>speaking</option><option>thinking</option></select></label>
+    </div>
+    <label>Mouth strength <input id="mouth" type="range" min="50" max="200" step="10" value="100" /> <span id="mouth-v">1.0×</span></label>
+    <label>Audible delay (automatic) <span id="delay-v">–</span></label>
+    <label>Sync trim <input id="trim" type="range" min="-300" max="300" step="10" value="0" /> <span id="trim-v">0 ms</span></label>
+    <div class="row"><button id="synctest">Run sync test</button> <button id="record">Record 20 s</button> <button id="mark">Jump! (J)</button> <button id="reference">Record my face 10 s</button> <button id="screen">Record screen 10 s</button> <span id="synctest-v" class="meta"></span></div>
+    <h2>Metrics</h2>
+    <table>
+      <tr><td>fps</td><td id="m-fps">–</td></tr>
+      <tr><td>main-thread update (avg / max 1 s)</td><td id="m-upd">–</td></tr>
+      <tr><td>whole frame incl. draw</td><td id="m-frame">–</td></tr>
+      <tr><td>audio → mouth (last onset)</td><td id="m-a2m">–</td></tr>
+      <tr><td>extractor lag (nominal)</td><td id="m-ext">–</td></tr>
+      <tr><td>output latency (device)</td><td id="m-out">–</td></tr>
+      <tr><td>live extractor</td><td id="m-name">–</td></tr>
+      <tr><td>neural: chunks run / dropped · late frames</td><td id="m-nn">–</td></tr>
+      <tr><td>voice: pitch · movement · rate</td><td id="m-pro">–</td></tr>
+      <tr><td>emotion read</td><td id="m-emo">–</td></tr>
+      <tr><td>viewer (webcam)</td><td id="m-att">–</td></tr>
+    </table>
+    <div class="bars" id="bars"></div>
+    <div class="bars" id="bar-labels" style="height:auto"></div>
+    <h2>Avatar</h2>
+    <div class="meta" id="meta">–</div>
+  </aside>
+</main>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>

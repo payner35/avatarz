@@ -1,0 +1,1 @@
+face_landmarker.task from https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task (MediaPipe, Apache-2.0), downloaded 2026-11-08. Served from our origin; used only to find where the viewer is so the avatar can look at them. No frames leave the page.

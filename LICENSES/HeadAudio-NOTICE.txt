@@ -1,0 +1,1 @@
+HeadAudio vendored from https://github.com/met4citizen/HeadAudio commit c6d8af35034068b1c98dcc0fa3ec9602d711e784 on 2026-11-08. Files: dist/headworklet.min.mjs, dist/headaudio.min.mjs, dist/model-en-mixed.bin. Licence: MIT (see HeadAudio-MIT.txt).

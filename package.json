@@ -1,0 +1,81 @@
+{
+  "name": "avatarz",
+  "version": "0.1.0",
+  "description": "Browser-only talking head that lip-syncs in real time to any Web Audio node. Sovereign, vendor-agnostic, framework-free.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Gavin Payne",
+  "main": "./dist/avatarz.js",
+  "module": "./dist/avatarz.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/avatarz.js"
+    },
+    "./assets/*": "./assets/*"
+  },
+  "files": [
+    "dist",
+    "assets/headaudio",
+    "assets/ort",
+    "assets/mediapipe",
+    "LICENSES",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "dev": "vite --open /",
+    "build": "tsc -p tsconfig.build.json && vite build --config vite.lib.config.ts && mkdir -p dist/assets && cp -R assets/headaudio assets/ort assets/mediapipe dist/assets/",
+    "build:demo": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "assets": "sh tools/fetch-assets.sh"
+  },
+  "keywords": [
+    "lip-sync",
+    "talking-head",
+    "viseme",
+    "avatar",
+    "vrm",
+    "web-audio",
+    "audioworklet",
+    "three"
+  ],
+  "peerDependencies": {
+    "@mediapipe/tasks-vision": "^0.10.0",
+    "@myned-ai/gsplat-flame-avatar-renderer": "^1.4.0",
+    "@pixiv/three-vrm": "^3.5.5",
+    "onnxruntime-web": "^1.31.0",
+    "three": ">=0.180.0"
+  },
+  "devDependencies": {
+    "@pixiv/three-vrm": "^3.5.5",
+    "@types/three": "^0.187.0",
+    "playwright": "^1.65.0",
+    "three": "^0.187.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.0",
+    "@myned-ai/gsplat-flame-avatar-renderer": "^1.4.0",
+    "onnxruntime-web": "^1.31.0"
+  },
+  "peerDependenciesMeta": {
+    "@myned-ai/gsplat-flame-avatar-renderer": {
+      "optional": true
+    },
+    "onnxruntime-web": {
+      "optional": true
+    },
+    "@mediapipe/tasks-vision": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/payner35/avatarz.git"
+  },
+  "homepage": "https://github.com/payner35/avatarz"
+}
