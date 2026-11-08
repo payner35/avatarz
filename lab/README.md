@@ -63,3 +63,19 @@ eats ~25 ms of that.
 
 The sync test's burst is now 700 ms so HeadAudio's voice gate opens on it. The lead is a plain widening
 of the delay line, so the mouth motion itself is unchanged; only its timing moved.
+
+## The chest smear (2026-11-08)
+
+The skin-coloured blur under the collar of the LAM heads is the end of the capture: the open neckline's
+last gaussians have no neighbours below them. Three things were tried on Jane with `tools/clean_splat.py`
+(it edits `offset.ply` opacities in the zip; gaussian i sits at skin.glb vertex i plus its offset, and
+`vertex_order.json` is only the draw order):
+
+| method | result |
+|---|---|
+| hide everything below a height, with a fade | smear gone, shoulders gone too: the jacket is the lowest part of the capture |
+| hide the biggest gaussians low down | removed the neck itself; the whole capture is ~1 cm gaussians |
+| **hide a 14 cm wide chest strip below y 1.50, 3 cm fade** | smear gone, shoulders untouched; the neck meets the jacket like a closed neckline |
+
+There are no more shoulders in the bundle than the default framing shows: framed wider, the jacket's own
+ragged bottom edge comes into view. `Jane-clean.zip` is built by `tools/fetch-assets.sh`.

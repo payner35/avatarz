@@ -342,7 +342,10 @@ var fe = class {
 	}
 }, he = "./assets/headaudio/", ge = new URL(he + "headworklet.min.mjs", import.meta.url), _e = new URL(he + "model-en-mixed.bin", import.meta.url), ve = /* @__PURE__ */ new WeakMap(), ye = class {
 	name = "headaudio";
-	latencyMs = 60;
+	get latencyMs() {
+		return 60 + this.leadMs;
+	}
+	leadMs;
 	node = null;
 	source = null;
 	energy = new fe();
@@ -362,7 +365,7 @@ var fe = class {
 	distances = null;
 	softTarget = new Float32Array(L);
 	constructor(e = {}) {
-		this.workletUrl = e.workletUrl ?? ge, this.modelUrl = e.modelUrl ?? _e, this.openRate = e.openRate ?? 15, this.closeRate = e.closeRate ?? 18, this.silenceMs = e.silenceMs ?? 250, this.softness = e.softness ?? .7;
+		this.workletUrl = e.workletUrl ?? ge, this.modelUrl = e.modelUrl ?? _e, this.openRate = e.openRate ?? 15, this.closeRate = e.closeRate ?? 18, this.silenceMs = e.silenceMs ?? 250, this.softness = e.softness ?? .7, this.leadMs = e.leadMs ?? 60;
 	}
 	async start(e, t) {
 		this.stop();
@@ -5810,6 +5813,7 @@ var Bi = class {
 	mark() {
 		this.recording && this.marks.push(performance.now() - this.t0);
 	}
+	audioTrack = null;
 	constructor(e, t) {
 		this.source = e, this.canvas = t;
 	}
@@ -5818,7 +5822,7 @@ var Bi = class {
 		let t = e ? this.canvas?.() : null;
 		if (t && "captureStream" in t && typeof MediaRecorder < "u") try {
 			let e = t.captureStream(0);
-			this.track = e.getVideoTracks()[0], this.media = new MediaRecorder(e, {
+			this.track = e.getVideoTracks()[0], this.audioTrack && e.addTrack(this.audioTrack), this.media = new MediaRecorder(e, {
 				mimeType: "video/webm;codecs=vp8",
 				videoBitsPerSecond: 8e6
 			}), this.media.ondataavailable = (e) => {
@@ -5972,7 +5976,12 @@ async function Yi(e) {
 			e["vis." + n] = t;
 		}), e["vis.jawOpen"] = t.jawOpen, e["vis.energy"] = t.energy, e["vis.speaking"] = +!!t.speaking), c) for (let t in c.mix) e["emo." + t] = c.mix[t];
 		return e["sys.fps"] = d.fps, e["sys.updateMs"] = d.updateMs, e;
-	}, () => [...r.parentElement?.querySelectorAll("canvas") ?? []].find((e) => e.width > 0 && getComputedStyle(e).display !== "none") ?? r), w = null, T = 0, E = !0, D = performance.now(), O = ue();
+	}, () => [...r.parentElement?.querySelectorAll("canvas") ?? []].find((e) => e.width > 0 && getComputedStyle(e).display !== "none") ?? r), w = null;
+	try {
+		let e = t.createMediaStreamDestination();
+		(a.delayNode ?? a.source).connect(e), C.audioTrack = e.stream.getAudioTracks()[0] ?? null;
+	} catch {}
+	let T = 0, E = !0, D = performance.now(), O = ue();
 	function k(t) {
 		if (!E) return;
 		T = requestAnimationFrame(k);

@@ -27,6 +27,11 @@ done
 [ -f assets/avatars/Seed-san.vrm ] || curl -L -o assets/avatars/Seed-san.vrm \
   "https://raw.githubusercontent.com/vrm-c/vrm-specification/master/samples/Seed-san/vrm/Seed-san.vrm"
 
+# Jane with the stray chest gaussians hidden (tools/clean_splat.py); the capture ends just below the
+# collar and the open neckline smeared. Parameters are per head: Sasha's crew neck would need none.
+[ -f assets/avatars/Jane-clean.zip ] || uv run --with numpy python tools/clean_splat.py assets/avatars/Jane.zip \
+  --cut 1.50 --fade 0.03 --chest-x 0.07 --out assets/avatars/Jane-clean.zip
+
 # The lip-sync model (Apache-2.0), downloaded and quantized to int8 by tools/fetch-model.sh.
 [ -f assets/wav2arkit/wav2arkit_int8.onnx ] || sh tools/fetch-model.sh
 echo "assets ready"
