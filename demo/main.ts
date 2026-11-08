@@ -55,6 +55,8 @@ async function build(): Promise<void> {
     extractor: $<HTMLSelectElement>('extractor').value as 'headaudio' | 'formant' | 'wav2arkit',
     renderer: rendererKind,
     delay: 'auto',
+    // ?bg=0x14171e gives the splat renderer an opaque background (recordings then match the page).
+    splat: new URLSearchParams(location.search).get('bg') ? { backgroundColor: new URLSearchParams(location.search).get('bg')! } : undefined,
     wav2arkit: {
       onProgress: (p) => { status.textContent = `downloading wav2arkit ${Math.round(p * 100)}%`; },
       // ?ep=wasm|webgpu  ?threads=4  ?chunk=400  for benchmarking

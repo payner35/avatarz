@@ -39,6 +39,9 @@ export class Recorder {
   /** Mark "I saw a jump now". */
   mark(): void { if (this.recording) this.marks.push(performance.now() - this.t0); }
 
+  /** Audio as heard (after the tap's delay line), added to the video so a recording is in sync by construction. */
+  audioTrack: MediaStreamTrack | null = null;
+
   constructor(private readonly source: () => Record<string, number>, private readonly canvas?: () => HTMLCanvasElement | null) {}
 
   start(video = true): void {
@@ -52,6 +55,7 @@ export class Recorder {
         // which made the pixel grader see jumps that were only the recording's.)
         const stream = (c as HTMLCanvasElement & { captureStream(fps?: number): MediaStream }).captureStream(0);
         this.track = stream.getVideoTracks()[0] as MediaStreamTrack & { requestFrame?: () => void };
+        if (this.audioTrack) stream.addTrack(this.audioTrack);
         this.media = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 8_000_000 });
         this.media.ondataavailable = (e) => { if (e.data.size) this.chunks.push(e.data); };
         this.media.start(250);

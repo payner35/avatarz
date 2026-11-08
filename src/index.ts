@@ -219,6 +219,12 @@ export async function createTalkingHead(o: TalkingHeadOptions): Promise<TalkingH
     return all.find((c) => c.width > 0 && getComputedStyle(c).display !== 'none') ?? canvas;
   });
   let lastFrame: VisemeFrame | null = null;
+  // The audible branch, as a MediaStream, so recordings carry the sound the face is synced to.
+  try {
+    const heard = context.createMediaStreamDestination();
+    (tap.delayNode ?? tap.source).connect(heard);
+    recorder.audioTrack = heard.stream.getAudioTracks()[0] ?? null;
+  } catch { /* no audio track in the recording */ }
 
   let raf = 0;
   let running = true;
